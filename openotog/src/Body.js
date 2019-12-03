@@ -14,7 +14,7 @@ class Problem extends React.Component{
         return(
             <Card>
                 <Card.Header as = "h5">
-                    Problem 1 Choi Ye Na
+                    Problem 1 {this.props.name}
                 </Card.Header>
 
                 <Row>
@@ -76,11 +76,13 @@ class Problem extends React.Component{
 class Timer extends React.Component{
     constructor(){
         super();
-        this.state = {time: {}, seconds: 5000}
+        this.state = {
+            time: {}, 
+            seconds: 5000
+        }
         this.timer = 0;
         this.countdown = this.countdown.bind(this);
     }
-
     secondsToTime(secs){
         let hour = Math.floor(secs/ (60*60));
 
@@ -99,6 +101,7 @@ class Timer extends React.Component{
     }
 
     componentDidMount() {
+        this.setState({ seconds: this.props.CountFrom});
         let timeleft = this.secondsToTime(this.state.seconds);
         this.setState({ time: timeleft});
         if (this.timer == 0 && this.state.seconds > 0){
@@ -128,6 +131,7 @@ class Timer extends React.Component{
 }
 class Annoucement extends React.Component{
     render(){
+        var timee = 50;
         return(
             <div>
                 <Card>
@@ -138,7 +142,7 @@ class Annoucement extends React.Component{
                             <Col xs = {2}></Col>
                             <Col>
                                 <br></br>
-                                <Timer /> 
+                                <Timer CountFrom={timee}/> 
                                 <br></br>
                             </Col>
                             </Row>
@@ -159,13 +163,31 @@ class Annoucement extends React.Component{
 }
 
 class Body extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+          data: null,
+        };
+    }
+    componentDidMount() {
+        fetch('/problem')
+        .then(res => res.json())
+        .then(data => this.setState({data : data.problem}))
+    }
     render(){
+        var prob = []
+        for(var e in this.state.data) {
+            console.log(this.state.data[e]);
+            prob.push(<Problem {...this.state.data[e]}/>)
+        }
         return (
             <Container>
                 <br></br>
                 <Row>
                     <Col xs = {9}>
-                        <Problem />
+                        <div>
+                            {prob}
+                        </div>
                     </Col>
                     <Col>
                         <Annoucement />
