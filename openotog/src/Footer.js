@@ -8,18 +8,14 @@ import Navbar from "react-bootstrap/Navbar";
 
 import "./App.css";
 
-const header = (
-  <h1>Hello</h1>
-);
-
-class App extends React.Component{
-  render(){
-    return (
-      <Container>
-        <header />
-      </Container>
-    );
-  }
+class Footer extends React.Component{
+    render(){
+        return (
+            <span>
+              <p>Hello footer!</p>
+            </span>
+        );
+    }
 }
 
-export default App;
+export default Footer;
