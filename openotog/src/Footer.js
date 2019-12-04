@@ -6,7 +6,7 @@ import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 
-import "./App.css";
+//import "./App.css";
 
 class Footer extends React.Component{
     render(){

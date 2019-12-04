@@ -8,7 +8,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 
-import "./App.css";
+//import "./App.css";
 
 class Header extends React.Component{
     render(){

@@ -7,7 +7,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
-import "./App.css";
+//import "./App.css";
 
 class Problem extends React.Component{
     viewPDF = async () => {
