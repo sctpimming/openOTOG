@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require("body-parser")
 const mysql = require('mysql');
+const fs = require("fs");
 var logger = require('morgan');
 require('dotenv').config()
 const config = {
@@ -24,11 +25,15 @@ app.get('/problem',(req,res) => {
 	con.query(sql,(err,result) => {
 		if(err) throw err
 		//var prob = JSON.stringify(result)
-		//console.log(prob);
+		//console.log(result);
 		res.json({
 			problem : result
 		})
 	})
+})
+app.get('/pdf/:sname',(req,res) => {
+	var file = fs.createReadStream("./docs/"+req.params.sname+".pdf");
+  	file.pipe(res);
 })
 app.listen(PORT,() => {
 	console.log("Starting server at PORT " + PORT)

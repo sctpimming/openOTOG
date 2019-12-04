@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { saveAs } from 'file-saver';
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -10,11 +10,29 @@ import Form from "react-bootstrap/Form";
 import "./App.css";
 
 class Problem extends React.Component{
+    viewPDF = async () => {
+        fetch('/pdf/'+this.props.sname, {
+            method: "GET",
+            headers: {
+            "Content-Type": "application/pdf"
+            }
+        })
+        .then(res => res.blob())
+        .then(response => {
+        const file = new Blob([response], {
+             type: "application/pdf"
+        });
+        saveAs(file,this.props.sname+'.pdf')
+    })
+    .catch(error => {
+        console.log(error);
+    });
+    };
     render(){
         return(
             <Card>
                 <Card.Header as = "h5">
-                    Problem 1 {this.props.name}
+                    Problem {this.props.index} {this.props.name}
                 </Card.Header>
 
                 <Row>
@@ -28,7 +46,7 @@ class Problem extends React.Component{
 
                             <Row>
                                 <Col>
-                                    <Button>View PDF</Button>
+                                    <Button onClick={this.viewPDF}>View PDF</Button>
                                 </Col>
                                 <Col>
                                     <Button>View Testcase</Button>
@@ -78,7 +96,8 @@ class Timer extends React.Component{
         super();
         this.state = {
             time: {}, 
-            seconds: 5000
+            seconds: 5000,
+            isloading : true
         }
         this.timer = 0;
         this.countdown = this.countdown.bind(this);
@@ -101,12 +120,13 @@ class Timer extends React.Component{
     }
 
     componentDidMount() {
-        this.setState({ seconds: this.props.CountFrom});
+        this.setState({ seconds: this.props.CountFrom });
         let timeleft = this.secondsToTime(this.state.seconds);
         this.setState({ time: timeleft});
         if (this.timer == 0 && this.state.seconds > 0){
             this.timer = setInterval(this.countdown, 1000);
-        }   
+        }  
+        this.setState({ isloading: false });
     }
 
     countdown(){
@@ -122,6 +142,11 @@ class Timer extends React.Component{
     }
 
     render(){
+        if(this.state.isloading) {
+            return(
+                <div>loading...</div>
+            )
+        }
         return(
             <div>
                 {this.state.time.h} hr : {this.state.time.m} m : {this.state.time.s} s
@@ -177,8 +202,7 @@ class Body extends React.Component{
     render(){
         var prob = []
         for(var e in this.state.data) {
-            console.log(this.state.data[e]);
-            prob.push(<Problem {...this.state.data[e]}/>)
+            prob.push(<Problem {...this.state.data[e]} index= {Number(e)+1}/>)
         }
         return (
             <Container>
