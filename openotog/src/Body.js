@@ -9,6 +9,42 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 //import "./App.css";
 
+class Submission extends React.Component{
+    render(){
+        return(
+        <div>
+            <br></br>
+            <Table bordered hover>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Result</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>PPPPPPPPPP</td>
+                        <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>PTPPPPPPPP</td>
+                        <td>90</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>P-PPPPPPPP</td>
+                        <td>90</td>
+                    </tr>
+                </tbody>
+            </Table>
+        </div>
+        );
+    }
+}
+
 class Problem extends React.Component{
     viewPDF = async () => {
         fetch('/pdf/'+this.props.sname, {
@@ -30,6 +66,8 @@ class Problem extends React.Component{
     };
     render(){
         return(
+            <div>
+            <br></br>
             <Card>
                 <Card.Header as = "h5">
                     Problem {this.props.index} {this.props.name}
@@ -39,54 +77,33 @@ class Problem extends React.Component{
                     <Col>
                         <Card.Body>
                             <Form.Control type="file" placeholder="Select file" />
-                            <br></br>   
-                            <Button variant="primary" type ="submit">
-                                Submit
-                            </Button>
-
+                            <br></br>
+                            <Container>
                             <Row>
-                                <Col>
-                                    <Button onClick={this.viewPDF}>View PDF</Button>
+                                <Col></Col>
+                                <Col xs = {6}>
+                                    <Button variant="primary" type ="submit" block>
+                                        Submit
+                                    </Button>
+                                    <p></p>
+                                    <br></br>                                  
+                                    <Button variant = "secondary" onClick={this.viewPDF} block>
+                                        View PDF
+                                    </Button>
                                 </Col>
-                                <Col>
-                                    <Button>View Testcase</Button>
-                                </Col>
+                                <Col></Col>
                             </Row>
-                            
+                            </Container>
+                        
                         </Card.Body>
                     </Col>
                     <Col>
-                        <br></br>
-                        <Table bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Result</th>
-                                    <th>Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>PPPPPPPPPP</td>
-                                    <td>100</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>PTPPPPPPPP</td>
-                                    <td>90</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>P-PPPPPPPP</td>
-                                    <td>90</td>
-                                </tr>
-                            </tbody>
-                        </Table>
+                        <Submission/>
                     </Col>
                     <Col xs={1}></Col>
                 </Row>
             </Card>
+            </div>
         );
     }
 }
@@ -159,6 +176,7 @@ class Annoucement extends React.Component{
         var timee = 50;
         return(
             <div>
+                <br></br>
                 <Card>
                     <Card.Header>Time left</Card.Header>
                     <Card.Title>
@@ -178,7 +196,9 @@ class Annoucement extends React.Component{
                 <Card>
                     <Card.Header>Annoucement</Card.Header>
                     <Container>
-                        <Card.Text><br></br>You can view help here!</Card.Text>
+                        <br></br>
+                        <Card.Text>You can view help here!</Card.Text>
+                        <br></br>
                     </Container>
                 </Card>
 
@@ -206,7 +226,7 @@ class Body extends React.Component{
         }
         return (
             <Container>
-                <br></br>
+                
                 <Row>
                     <Col xs = {9}>
                         <div>
