@@ -84,9 +84,7 @@ class Problem extends React.Component{
                                 <Col xs = {6}>
                                     <Button variant="primary" type ="submit" block>
                                         Submit
-                                    </Button>
-                                    <p></p>
-                                    <br></br>                                  
+                                    </Button>                              
                                     <Button variant = "secondary" onClick={this.viewPDF} block>
                                         View PDF
                                     </Button>

@@ -48,43 +48,34 @@ class Login extends Component {
     }
     return (
         <Container>
+            <br></br>
+            <br></br>
             <Row>
-            <div className="col-md-6 mt-5 mx-auto">
-                <form noValidate onSubmit={this.onSubmit}>
-                <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
-                <div className="form-group">
-                    <label htmlFor="username">Email address</label>
-                    <input
-                    type="username"
-                    className="form-control"
-                    name="username"
-                    placeholder="Enter username"
-                    value={this.state.username}
-                    onChange={this.onChange}
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                    type="password"
-                    className="form-control"
-                    name="password"
-                    placeholder="Password"
-                    value={this.state.password}
-                    onChange={this.onChange}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    className="btn btn-lg btn-primary btn-block"
-                >
+              <Col></Col>
+              <Col xs = {6}>
+                <Form onSubmit = {this.onSubmit}>
+                  <h1 className="h3 mb-3 font-weight-normal">Please sign in</h1>
+                  <Form.Group controlId = "form_username">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control type = "username" name = "username" value ={this.state.username} 
+                    onChange = {this.onChange} placeholder = "Enter username" />
+                  </Form.Group>
+
+                  <Form.Group controlId = "form_password">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type = "password" name = "password" value = {this.state.password}
+                    onChange = {this.onChange} placeholder = "Password"/>
+                  </Form.Group>
+
+                  <Button variant = "primary" type = "submit" block>
                     Sign in
-                </button>
-                </form>
-            </div>
+                  </Button>
+                </Form>
+              </Col>
+              <Col></Col>
             </Row>
         </Container>
-    )
+    );
   }
 }
 
