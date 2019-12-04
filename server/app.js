@@ -1,9 +1,10 @@
 const express = require('express')
 const bodyParser = require("body-parser")
+const multer  = require('multer')
 const mysql = require('mysql');
 const fs = require("fs");
-var jwt = require('jsonwebtoken');
-var logger = require('morgan');
+const jwt = require('jsonwebtoken');
+const logger = require('morgan');
 require('dotenv').config()
 process.env.SECRET_KEY = fs.readFileSync('./private.key', 'utf8');
 process.env.PUBLIC_KEY = fs.readFileSync('./public.key', 'utf8');
@@ -49,7 +50,7 @@ app.post('/user/login',(req,res) => {
 		if(result[0] == null) res.status(200).send('')
 		else if(result[0].password != password) res.status(200).send('')
 		else {
-			var data = {username : result[0].username, id : result[0].id, sname : result[0].sname};
+			var data = {username : result[0].username, id : result[0].idUser, sname : result[0].sname};
 			let token = jwt.sign(data, process.env.SECRET_KEY, {
 				algorithm:  "RS256"
 			})
@@ -57,6 +58,49 @@ app.post('/user/login',(req,res) => {
 		res.send(token);
 		}
 	})
+})
+app.get('/submission/:id',(req,res) => {
+	var id = req.params.id
+	var token = req.headers.authorization
+	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
+	var sql = 'select * from submis where user_id = ? and prob_id = ? order by idResult desc limit 3'
+	con.query(sql,[decoded.id,id], (err,result) => {
+		if(err) throw err;
+		res.json({
+			submis : result
+		})
+	})
+	//console.log(decoded);
+	
+})
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, 'uploads')
+	},
+	filename: function (req, file, cb) {
+		var id = req.params.id
+		var token = req.headers.authorization
+		var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
+		var filename = file.originalname.split('.')
+		var fileext = filename[1]
+		cb(null, id + "_" + decoded.id + "." +fileext)
+	}
+})
+var upload = multer({ storage: storage })
+app.post('/upload/:id',upload.single('file'),(req,res) => {
+	var id = req.params.id
+	var token = req.headers.authorization
+	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
+	var upload_file = req.file
+	var filename = upload_file.originalname.split('.')
+	var fileext = filename[1]
+	var millis = Date.now();
+	var time_now = Math.floor(millis/1000);
+	filename = id + "_" + decoded.id + "." +fileext
+	var text = fs.readFileSync('./uploads/'+filename,'utf8');
+	var sql = "INSERT INTO submis (time, user_id, prob_id, status,scode) VALUES ?";
+	var values = [[time_now,Number(decoded.id),Number(id),0,text],];
+	con.query(sql, [values], (err, result) => {if(err) throw err})
 })
 app.listen(PORT,() => {
 	console.log("Starting server at PORT " + PORT)

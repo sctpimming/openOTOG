@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import { saveAs } from 'file-saver';
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -10,7 +11,31 @@ import Form from "react-bootstrap/Form";
 //import "./App.css";
 
 class Submission extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+          data: null,
+        };
+    }
+    componentDidMount() {
+        fetch('/submission/'+this.props.idProb,{
+            headers: {
+                authorization: localStorage.usertoken
+            }
+        })
+        .then(res => res.json())
+        .then(data => this.setState({data : data.submis}))
+    }
     render(){
+        var submis = []
+        for(var e in this.state.data) {
+            var temp = this.state.data[e]
+            submis.push(<tr>
+                <td>{Number(e)+1}</td>
+                <td>{temp.result}</td>
+                <td>{temp.score}</td>
+            </tr>)
+        }
         return(
         <div>
             <br></br>
@@ -23,21 +48,7 @@ class Submission extends React.Component{
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>PPPPPPPPPP</td>
-                        <td>100</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>PTPPPPPPPP</td>
-                        <td>90</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>P-PPPPPPPP</td>
-                        <td>90</td>
-                    </tr>
+                    {submis}
                 </tbody>
             </Table>
         </div>
@@ -46,24 +57,47 @@ class Submission extends React.Component{
 }
 
 class Problem extends React.Component{
+    constructor () {
+		super()
+		this.state = {
+			selectedFile: undefined
+		}
+	}
+	onChangeHandler=event=>{
+		this.setState({
+			selectedFile: event.target.files[0],
+		})
+		console.log(event.target.files[0])
+	}
+	onClickHandler = () => {
+        if(this.state.selectedFile === undefined) return false
+        const data = new FormData() 
+        data.append('file', this.state.selectedFile)
+		axios.post("/upload/"+this.props.id_Prob,data, {
+			headers : {
+				authorization : localStorage.usertoken
+			}
+        })
+        .then(res => console.log(res.statusText))
+        window.location.reload(false);
+	}
     viewPDF = async () => {
         fetch('/pdf/'+this.props.sname, {
             method: "GET",
             headers: {
-            "Content-Type": "application/pdf"
+                "Content-Type": "application/pdf"
             }
         })
         .then(res => res.blob())
         .then(response => {
-        const file = new Blob([response], {
-             type: "application/pdf"
+            const file = new Blob([response], {type: "application/pdf"});
+            saveAs(file,this.props.sname+'.pdf')
+        })
+        .catch(error => {
+            console.log(error);
         });
-        saveAs(file,this.props.sname+'.pdf')
-    })
-    .catch(error => {
-        console.log(error);
-    });
     };
+    
     render(){
         return(
             <div>
@@ -76,13 +110,13 @@ class Problem extends React.Component{
                 <Row>
                     <Col>
                         <Card.Body>
-                            <Form.Control type="file" placeholder="Select file" />
+                            <Form.Control type="file" placeholder="Select file" onChange={this.onChangeHandler}/>
                             <br></br>
                             <Container>
                             <Row>
                                 <Col></Col>
                                 <Col xs = {6}>
-                                    <Button variant="primary" type ="submit" block>
+                                    <Button variant="primary" type ="submit" onClick={this.onClickHandler} block>
                                         Submit
                                     </Button>                              
                                     <Button variant = "secondary" onClick={this.viewPDF} block>
@@ -96,7 +130,7 @@ class Problem extends React.Component{
                         </Card.Body>
                     </Col>
                     <Col>
-                        <Submission/>
+                        <Submission idProb={this.props.id_Prob} />
                     </Col>
                     <Col xs={1}></Col>
                 </Row>
