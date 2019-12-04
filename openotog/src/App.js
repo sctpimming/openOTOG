@@ -11,9 +11,7 @@ import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 
 import "./App.css";
-import Header from './Header';
-import Footer from './Footer';
-import Body from './Body';
+import Main from './Main';
 import Login from './Login';
 
 const header = (
@@ -25,14 +23,9 @@ class App extends React.Component{
     return (
       <Router>
         <Switch>
-          <Route path='/main'>
-            <Header />
-            <Body />
-            <Footer />
+          <Route path='/main' component={Main}>
           </Route>
-          <Router path='/login'>
-            <Login />
-          </Router>
+          <Route path='/login' component={Login}/>
         </Switch>
       </Router>
     );
