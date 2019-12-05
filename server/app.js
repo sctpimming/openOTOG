@@ -63,11 +63,21 @@ app.get('/submission/:id',(req,res) => {
 	var id = req.params.id
 	var token = req.headers.authorization
 	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
-	var sql = 'select * from submis where user_id = ? and prob_id = ? order by idResult desc limit 3'
-	con.query(sql,[decoded.id,id], (err,result) => {
-		if(err) throw err;
+	var last_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
+	var best_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
+	var lastest = new Promise((resolve, reject) => con.query(last_query,[decoded.id,id],(err,result) => {
+		if(err) throw err
+		resolve(result)
+	}))
+	var best = new Promise((resolve, reject) => con.query(best_query,[decoded.id,id],(err,result) => {
+		if(err) throw err
+		resolve(result)
+	}))
+	Promise.all([lastest, best]).then(function(values) {
+		//console.log(values);
 		res.json({
-			submis : result
+			lastest_submit : values[0],
+			best_submit : values[1]
 		})
 	})
 	//console.log(decoded);
