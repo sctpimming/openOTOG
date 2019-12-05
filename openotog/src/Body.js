@@ -8,13 +8,17 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
+import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+
 //import "./App.css";
 
 class Submission extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-          data: null,
+          best : null,
+          lastest : null
         };
     }
     componentDidMount() {
@@ -24,17 +28,26 @@ class Submission extends React.Component{
             }
         })
         .then(res => res.json())
-        .then(data => this.setState({data : data.submis}))
+        .then(data => this.setState({best : data.best_submit, lastest : data.lastest_submit}))        
     }
     render(){
-        var submis = []
-        for(var e in this.state.data) {
-            var temp = this.state.data[e]
-            submis.push(<tr>
-                <td>{Number(e)+1}</td>
+        var best_submission = [], last_submission = []
+        for(var e in this.state.best) {
+            var temp = this.state.best[e]
+            best_submission.push(<tr>
+                <td>Best 👍</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
             </tr>)
+        }
+        for(var e in this.state.lastest) {
+            var temp = this.state.lastest[e]
+            last_submission.push(<tr>
+                <td>Lastest</td>
+                <td>{temp.result}</td>
+                <td>{temp.score}</td>
+            </tr>)
+            this.props.ParentCallback(Number(temp.score))
         }
         return(
         <div>
@@ -48,7 +61,8 @@ class Submission extends React.Component{
                     </tr>
                 </thead>
                 <tbody>
-                    {submis}
+                    {last_submission}
+                    {best_submission}
                 </tbody>
             </Table>
         </div>
@@ -60,7 +74,8 @@ class Problem extends React.Component{
     constructor () {
 		super()
 		this.state = {
-			selectedFile: undefined
+            selectedFile: undefined,
+            solved: false
 		}
 	}
 	onChangeHandler=event=>{
@@ -97,31 +112,46 @@ class Problem extends React.Component{
             console.log(error);
         });
     };
-    
+    CallbackFunc = (ChildData) => {
+        if(ChildData == 100)this.setState({solved:true})
+    }
+
     render(){
         return(
             <div>
             <br></br>
             <Card>
                 <Card.Header as = "h5">
-                    Problem {this.props.index} {this.props.name}
+                    Problem {this.props.index} {this.props.name} {this.state.solved}
                 </Card.Header>
 
                 <Row>
                     <Col>
                         <Card.Body>
-                            <Form.Control type="file" placeholder="Select file" onChange={this.onChangeHandler}/>
+                            <div class = "custom-file">
+                                <input type = "file" class = "custom-file-input" onChange={this.onChangeHandler} id = "submit_code">                                    
+                                </input>
+                                <label class = "custom-file-label" for = "submit_code">Select file</label>
+                            </div>
+                            <br></br>
                             <br></br>
                             <Container>
                             <Row>
                                 <Col></Col>
-                                <Col xs = {6}>
-                                    <Button variant="primary" type ="submit" onClick={this.onClickHandler} block>
-                                        Submit
-                                    </Button>                              
-                                    <Button variant = "secondary" onClick={this.viewPDF} block>
-                                        View PDF
-                                    </Button>
+                                <Col xs = {10}>
+                                    <ButtonToolbar>
+                                        <ButtonGroup className = "mr-4">
+                                            <Button variant="primary" type ="submit" onClick={this.onClickHandler} >
+                                                Submit
+                                            </Button>    
+                                        </ButtonGroup>
+                                        <ButtonGroup className = "mr-4">
+                                                <Button variant = "secondary" onClick={this.viewPDF} >
+                                                View PDF
+                                            </Button>                
+                                        </ButtonGroup>              
+                            
+                                    </ButtonToolbar>
                                 </Col>
                                 <Col></Col>
                             </Row>
@@ -130,7 +160,7 @@ class Problem extends React.Component{
                         </Card.Body>
                     </Col>
                     <Col>
-                        <Submission idProb={this.props.id_Prob} />
+                        <Submission idProb={this.props.id_Prob} ParentCallback={this.CallbackFunc}/>
                     </Col>
                     <Col xs={1}></Col>
                 </Row>
