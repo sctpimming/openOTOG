@@ -10,6 +10,7 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Badge from "react-bootstrap/Badge";
 
 //import "./App.css";
 
@@ -28,13 +29,19 @@ class Submission extends React.Component{
             }
         })
         .then(res => res.json())
-        .then(data => this.setState({best : data.best_submit, lastest : data.lastest_submit}))        
+        .then(data => {
+            this.setState({best : data.best_submit, lastest : data.lastest_submit})
+            this.sendData()     
+        })
+    }
+    sendData = () => {
+        if(this.state.lastest[0] !== undefined)this.props.ParentCallback(this.state.lastest[0].score);
     }
     render(){
         var best_submission = [], last_submission = []
         for(var e in this.state.best) {
             var temp = this.state.best[e]
-            best_submission.push(<tr>
+            best_submission.push(<tr key={e}>
                 <td>Best 👍</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
@@ -42,12 +49,11 @@ class Submission extends React.Component{
         }
         for(var e in this.state.lastest) {
             var temp = this.state.lastest[e]
-            last_submission.push(<tr>
+            last_submission.push(<tr key={e}>
                 <td>Lastest</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
             </tr>)
-            this.props.ParentCallback(Number(temp.score))
         }
         return(
         <div>
@@ -75,14 +81,18 @@ class Problem extends React.Component{
 		super()
 		this.state = {
             selectedFile: undefined,
+            fileName: 'Select file',
             solved: false
 		}
 	}
 	onChangeHandler=event=>{
+        var name = 'Select file'
+        if(event.target.files[0]!==undefined) name = event.target.files[0].name
 		this.setState({
-			selectedFile: event.target.files[0],
+            selectedFile: event.target.files[0],
+            fileName: name
 		})
-		console.log(event.target.files[0])
+		//console.log(event.target.files[0])
 	}
 	onClickHandler = () => {
         if(this.state.selectedFile === undefined) return false
@@ -114,24 +124,24 @@ class Problem extends React.Component{
     };
     CallbackFunc = (ChildData) => {
         if(ChildData == 100)this.setState({solved:true})
+        
     }
-
     render(){
         return(
             <div>
             <br></br>
             <Card>
                 <Card.Header as = "h5">
-                    Problem {this.props.index} {this.props.name} {this.state.solved}
+                    Problem {this.props.index} {this.props.name + ' '}
+                    {this.state.solved && <Badge variant = "success">Solved</Badge>}
                 </Card.Header>
 
                 <Row>
                     <Col>
                         <Card.Body>
-                            <div class = "custom-file">
-                                <input type = "file" class = "custom-file-input" onChange={this.onChangeHandler} id = "submit_code">                                    
-                                </input>
-                                <label class = "custom-file-label" for = "submit_code">Select file</label>
+                            <div className = "custom-file">
+                                <input type = "file" className = "custom-file-input" onChange={this.onChangeHandler} id="submit_code" />
+                                <label className="custom-file-label" htmlFor="submit_code">{this.state.fileName}</label>
                             </div>
                             <br></br>
                             <br></br>
@@ -284,7 +294,7 @@ class Body extends React.Component{
     render(){
         var prob = []
         for(var e in this.state.data) {
-            prob.push(<Problem {...this.state.data[e]} index= {Number(e)+1}/>)
+            prob.push(<Problem key={e} {...this.state.data[e]} index= {Number(e)+1}/>)
         }
         return (
             <Container>

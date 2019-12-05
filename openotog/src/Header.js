@@ -24,7 +24,7 @@ class Header extends React.Component{
             <Navbar bg="dark" variant = "dark" sticky="top">
                 <Navbar.Brand href="#">{' '}openOTOG</Navbar.Brand>
                 <Container>
-                    <p1></p1>
+                    <p></p>
                     <Button variant = "danger" onClick={this.LogOut}>Logout</Button>
                 </Container>
             </Navbar>
