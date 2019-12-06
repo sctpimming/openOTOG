@@ -63,8 +63,8 @@ app.get('/submission/:id',(req,res) => {
 	var id = req.params.id
 	var token = req.headers.authorization
 	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
-	var last_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
-	var best_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
+	var last_query = 'select result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
+	var best_query = 'select result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
 	var lastest = new Promise((resolve, reject) => con.query(last_query,[decoded.id,id],(err,result) => {
 		if(err) throw err
 		resolve(result)
