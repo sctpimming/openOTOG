@@ -7,7 +7,6 @@ class Main extends React.Component{
     render(){
         if(!localStorage.usertoken) this.props.history.push("/login")
         //console.log(this.props.history);
-        
         return (
             <div>
                 <Header history={this.props.history}/>
