@@ -10,15 +10,111 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+<<<<<<< HEAD
+import Modal from "react-bootstrap/Modal";
+//import "./App.css";
+
+const source_code = React.createClass({
+  getInitialState() {
+    return { showModal: false };
+  },
+
+  close() {
+    this.setState({ showModal: false });
+  },
+
+  open() {
+    this.setState({ showModal: true });
+  },
+
+  render() {
+    
+    return (
+      <div>
+        <p>Click to get the full Modal experience!</p>
+
+        <Button
+          bsStyle="primary"
+          bsSize="large"
+          onClick={this.open}
+        >
+          Launch demo modal
+        </Button>
+
+        <Modal show={this.state.showModal} onHide={this.close}>
+          <Modal.Header closeButton>
+            <Modal.Title>Modal heading</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <h4>Text in a modal</h4>
+            <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</p>
+
+            <h4>Popover in a modal</h4>
+            
+
+            <hr />
+
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={this.close}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    );
+  }
+});
+=======
+import Badge from "react-bootstrap/Badge";
+import Modal from "react-bootstrap/Modal";
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 //import "./App.css";
+
+class MyModal extends React.Component{
+    Hidemodal= () => {
+        this.props.onHide(false)
+    }
+    render(){
+        var Code = this.props.SC
+        //console.log(Code);
+        return (
+            <Modal
+              show={this.props.modalShow}
+              onHide={this.Hidemodal}
+              size="lg"
+              aria-labelledby="contained-modal-title-vcenter"
+              centered
+            >
+                <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                Source Code⚡⚡
+                </Modal.Title>
+                </Modal.Header>
+              <Modal.Body>
+                <SyntaxHighlighter language="cpp" style={atomOneDark}>
+                    {Code}
+                </SyntaxHighlighter>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button onClick={this.Hidemodal}>Close</Button>
+              </Modal.Footer>
+            </Modal>
+          );
+    }
+}
+>>>>>>> d873b1c7a688269065650be25da7ade7227c8931
 
 class Submission extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
           best : null,
-          lastest : null
+          lastest : null,
+<<<<<<< HEAD
+=======
+          SC : 'test',
+>>>>>>> d873b1c7a688269065650be25da7ade7227c8931
         };
     }
     componentDidMount() {
@@ -28,26 +124,57 @@ class Submission extends React.Component{
             }
         })
         .then(res => res.json())
-        .then(data => this.setState({best : data.best_submit, lastest : data.lastest_submit}))        
+        .then(data => {
+            this.setState({best : data.best_submit, lastest : data.lastest_submit})
+            this.sendData()     
+        })
+    }
+    sendData = () => {
+        if(this.state.lastest[0] !== undefined)this.props.ParentCallback(this.state.lastest[0].score);
+    }
+    HideSc = event => {
+        this.setState({showSc : event})
+    }
+    ShowBest = () => {
+        this.setState({showSc : true, SC : this.state.best[0].scode})
+    }
+    ShowLast = () => {
+        this.setState({showSc : true, SC : this.state.lastest[0].scode })
+    }
+    quickResend = e => {
+        axios.post('/quickresend',{id : e})
+        window.location.reload(false);
     }
     render(){
+        //console.log('submit ' + this.state.best);
         var best_submission = [], last_submission = []
         for(var e in this.state.best) {
             var temp = this.state.best[e]
+<<<<<<< HEAD
             best_submission.push(<tr>
+                <td>
+                    <source_code />
+                </td>
+=======
+            best_submission.push(<tr key={e}>
                 <td>Best 👍</td>
+>>>>>>> d873b1c7a688269065650be25da7ade7227c8931
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
+                <ButtonGroup size="sm">
+                    <Button onClick={this.ShowBest.bind(this)}> * </Button>
+                    <Button onClick={this.quickResend.bind(this,temp.idResult)}>♻</Button>
+                </ButtonGroup>
             </tr>)
         }
         for(var e in this.state.lastest) {
             var temp = this.state.lastest[e]
-            last_submission.push(<tr>
+            last_submission.push(<tr key={e}>
                 <td>Lastest</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
+                <Button onClick={this.ShowLast.bind(this)}> * </Button>
             </tr>)
-            this.props.ParentCallback(Number(temp.score))
         }
         return(
         <div>
@@ -65,6 +192,7 @@ class Submission extends React.Component{
                     {best_submission}
                 </tbody>
             </Table>
+            <MyModal modalShow={this.state.showSc} onHide={this.HideSc} SC={this.state.SC} />
         </div>
         );
     }
@@ -75,14 +203,18 @@ class Problem extends React.Component{
 		super()
 		this.state = {
             selectedFile: undefined,
+            fileName: 'Select file',
             solved: false
 		}
 	}
 	onChangeHandler=event=>{
+        var name = 'Select file'
+        if(event.target.files[0]!==undefined) name = event.target.files[0].name
 		this.setState({
-			selectedFile: event.target.files[0],
+            selectedFile: event.target.files[0],
+            fileName: name
 		})
-		console.log(event.target.files[0])
+		//console.log(event.target.files[0])
 	}
 	onClickHandler = () => {
         if(this.state.selectedFile === undefined) return false
@@ -114,24 +246,24 @@ class Problem extends React.Component{
     };
     CallbackFunc = (ChildData) => {
         if(ChildData == 100)this.setState({solved:true})
+        
     }
-
     render(){
         return(
             <div>
             <br></br>
             <Card>
                 <Card.Header as = "h5">
-                    Problem {this.props.index} {this.props.name} {this.state.solved}
+                    Problem {this.props.index} {this.props.name + ' '}
+                    {this.state.solved && <Badge variant = "success">Solved</Badge>}
                 </Card.Header>
 
                 <Row>
                     <Col>
                         <Card.Body>
-                            <div class = "custom-file">
-                                <input type = "file" class = "custom-file-input" onChange={this.onChangeHandler} id = "submit_code">                                    
-                                </input>
-                                <label class = "custom-file-label" for = "submit_code">Select file</label>
+                            <div className = "custom-file">
+                                <input type = "file" className = "custom-file-input" onChange={this.onChangeHandler} id="submit_code" />
+                                <label className="custom-file-label" htmlFor="submit_code">{this.state.fileName}</label>
                             </div>
                             <br></br>
                             <br></br>
@@ -175,11 +307,9 @@ class Timer extends React.Component{
         super();
         this.state = {
             time: {}, 
-            seconds: 5000,
-            isloading : true
+            finish_time: 1,
         }
         this.timer = 0;
-        this.countdown = this.countdown.bind(this);
     }
     secondsToTime(secs){
         let hour = Math.floor(secs/ (60*60));
@@ -199,33 +329,29 @@ class Timer extends React.Component{
     }
 
     componentDidMount() {
-        this.setState({ seconds: this.props.CountFrom });
-        let timeleft = this.secondsToTime(this.state.seconds);
+        this.setState({ finish_time: this.props.CountTo-25200 });
+        let timeNow = Math.floor((Date.now())/1000)
+        let seconds = this.props.CountTo- 25200 - timeNow;
+        let timeleft = this.secondsToTime(seconds);
         this.setState({ time: timeleft});
-        if (this.timer == 0 && this.state.seconds > 0){
+        if (this.timer == 0 && this.state.finish_time > 0){
             this.timer = setInterval(this.countdown, 1000);
         }  
-        this.setState({ isloading: false });
     }
-
-    countdown(){
-        let seconds = this.state.seconds - 1;
+    countdown = () => {
+        let timeNow = Math.floor((Date.now())/1000)
+        let seconds = this.state.finish_time - timeNow;
+        //console.log(seconds);
+        
         this.setState({
             time : this.secondsToTime(seconds),
-            seconds : seconds,
         });
-
-        if(seconds == 0){
+        if(seconds <= 0){
             clearInterval(this.timer);
         }
     }
 
     render(){
-        if(this.state.isloading) {
-            return(
-                <div>loading...</div>
-            )
-        }
         return(
             <div>
                 {this.state.time.h} hr : {this.state.time.m} m : {this.state.time.s} s
@@ -235,11 +361,11 @@ class Timer extends React.Component{
 }
 class Annoucement extends React.Component{
     render(){
-        var timee = 50;
+        var timee = 1575563400;
         return(
             <div>
                 <br></br>
-                <Card>
+                <Card sticky>
                     <Card.Header>Time left</Card.Header>
                     <Card.Title>
                         <Container>
@@ -247,7 +373,7 @@ class Annoucement extends React.Component{
                             <Col xs = {2}></Col>
                             <Col>
                                 <br></br>
-                                <Timer CountFrom={timee}/> 
+                                <Timer CountTo={timee}/> 
                                 <br></br>
                             </Col>
                             </Row>
@@ -284,7 +410,7 @@ class Body extends React.Component{
     render(){
         var prob = []
         for(var e in this.state.data) {
-            prob.push(<Problem {...this.state.data[e]} index= {Number(e)+1}/>)
+            prob.push(<Problem key={e} {...this.state.data[e]} index= {Number(e)+1}/>)
         }
         return (
             <Container>

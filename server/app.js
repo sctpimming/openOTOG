@@ -63,8 +63,8 @@ app.get('/submission/:id',(req,res) => {
 	var id = req.params.id
 	var token = req.headers.authorization
 	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
-	var last_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
-	var best_query = 'select result,score,errmsg from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
+	var last_query = 'select idResult,result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
+	var best_query = 'select idResult,result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
 	var lastest = new Promise((resolve, reject) => con.query(last_query,[decoded.id,id],(err,result) => {
 		if(err) throw err
 		resolve(result)
@@ -111,6 +111,19 @@ app.post('/upload/:id',upload.single('file'),(req,res) => {
 	var sql = "INSERT INTO submis (time, user_id, prob_id, status,scode) VALUES ?";
 	var values = [[time_now,Number(decoded.id),Number(id),0,text],];
 	con.query(sql, [values], (err, result) => {if(err) throw err})
+})
+app.post('/quickresend',(req,res) => {
+	var id = req.body.id
+	var sql = 'select * from submis where idResult = ?'
+	con.query(sql,[id],(err,result) => {
+		if(err) throw err;
+		result = result[0]
+		var millis = Date.now();
+		var time_now = Math.floor(millis/1000);
+		var sql = "INSERT INTO submis (time, user_id, prob_id, status,scode) VALUES ?";
+		var values = [[time_now,Number(result.user_id),Number(result.prob_id),0,result.scode],];
+		con.query(sql, [values], (err, result) => {if(err) throw err})
+	})
 })
 app.listen(PORT,() => {
 	console.log("Starting server at PORT " + PORT)
