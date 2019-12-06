@@ -21,8 +21,10 @@ class Header extends React.Component{
     }
     componentDidMount() {
         const token = localStorage.usertoken;
-        const decoded = jwt_decode(token);
-        this.setState({name : decoded.sname})
+        if(token) {
+            const decoded = jwt_decode(token);
+            this.setState({name : decoded.sname})
+        }
     }
     LogOut() {
         localStorage.removeItem('usertoken');
