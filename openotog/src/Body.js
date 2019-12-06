@@ -83,6 +83,10 @@ class Submission extends React.Component{
     ShowLast = () => {
         this.setState({showSc : true, SC : this.state.lastest[0].scode })
     }
+    quickResend = e => {
+        axios.post('/quickresend',{id : e})
+        window.location.reload(false);
+    }
     render(){
         //console.log('submit ' + this.state.best);
         var best_submission = [], last_submission = []
@@ -92,8 +96,10 @@ class Submission extends React.Component{
                 <td>Best 👍</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
-                <Button onClick={this.ShowBest}> * </Button>
-                
+                <ButtonGroup size="sm">
+                    <Button onClick={this.ShowBest.bind(this)}> * </Button>
+                    <Button onClick={this.quickResend.bind(this,temp.idResult)}>♻</Button>
+                </ButtonGroup>
             </tr>)
         }
         for(var e in this.state.lastest) {
@@ -102,7 +108,7 @@ class Submission extends React.Component{
                 <td>Lastest</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
-                <Button onClick={this.ShowLast}> * </Button>
+                <Button onClick={this.ShowLast.bind(this)}> * </Button>
             </tr>)
         }
         return(
