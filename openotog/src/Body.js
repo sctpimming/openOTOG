@@ -197,7 +197,7 @@ class Problem extends React.Component{
                     <Col>
                         <Card.Body>
                             <div className = "custom-file">
-                                <input type = "file" className = "custom-file-input" onChange={this.onChangeHandler} id="submit_code" />
+                                <input accept=".c,.cpp" type = "file" className = "custom-file-input" onChange={this.onChangeHandler} id="submit_code" />
                                 <label className="custom-file-label" htmlFor="submit_code">{this.state.fileName}</label>
                             </div>
                             <br></br>
@@ -296,7 +296,7 @@ class Timer extends React.Component{
 }
 class Annoucement extends React.Component{
     render(){
-        var timee = 1575563400;
+        var timee = 1577811600;
         return(
             <div>
                 <br></br>
