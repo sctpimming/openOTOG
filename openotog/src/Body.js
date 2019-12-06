@@ -96,10 +96,9 @@ class Submission extends React.Component{
                 <td>Best 👍</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
-                <ButtonGroup size="sm">
-                    <Button onClick={this.ShowBest.bind(this)}> * </Button>
-                    <Button onClick={this.quickResend.bind(this,temp.idResult)}>♻</Button>
-                </ButtonGroup>
+                <td>
+                    <Button size = "sm" variant = "outline-link" onClick={this.ShowBest.bind(this)}>🔎</Button>
+                </td>
             </tr>)
         }
         for(var e in this.state.lastest) {
@@ -108,18 +107,21 @@ class Submission extends React.Component{
                 <td>Lastest</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
-                <Button onClick={this.ShowLast.bind(this)}> * </Button>
+                <td>
+                    <Button size = "sm" variant = "outline-link" onClick={this.ShowLast.bind(this)}>🔎</Button>
+                </td>
             </tr>)
         }
         return(
         <div>
             <br></br>
-            <Table bordered hover>
+            <Table size = "sm" bordered hover centered>
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Result</th>
                         <th>Score</th>
+                        <th>Code</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,10 +189,13 @@ class Problem extends React.Component{
         return(
             <div>
             <br></br>
+            <br></br>
             <Card>
                 <Card.Header as = "h5">
                     Problem {this.props.index} {this.props.name + ' '}
                     {this.state.solved && <Badge variant = "success">Solved</Badge>}
+                    <p></p>
+                    <Button variant = "outline-info" size = "sm">Quick Submit ⚡</Button>
                 </Card.Header>
 
                 <Row>

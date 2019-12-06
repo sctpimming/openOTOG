@@ -32,9 +32,8 @@ class Header extends React.Component{
         return (
             <Navbar bg="dark" variant = "dark" sticky="top">
                 <Navbar.Brand href="#">{' '}openOTOG</Navbar.Brand>
-                <font size={4} color={'white'}>{this.state.name}</font>
                 <Container>
-                    <p></p>
+                    <font size={4} color={'white'}>{this.state.name}</font>
                     <Button variant = "danger" onClick={this.LogOut.bind(this)}>Logout</Button>
                 </Container>
             </Navbar>
