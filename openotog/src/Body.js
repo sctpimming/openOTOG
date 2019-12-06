@@ -10,60 +10,6 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-<<<<<<< HEAD
-import Modal from "react-bootstrap/Modal";
-//import "./App.css";
-
-const source_code = React.createClass({
-  getInitialState() {
-    return { showModal: false };
-  },
-
-  close() {
-    this.setState({ showModal: false });
-  },
-
-  open() {
-    this.setState({ showModal: true });
-  },
-
-  render() {
-    
-    return (
-      <div>
-        <p>Click to get the full Modal experience!</p>
-
-        <Button
-          bsStyle="primary"
-          bsSize="large"
-          onClick={this.open}
-        >
-          Launch demo modal
-        </Button>
-
-        <Modal show={this.state.showModal} onHide={this.close}>
-          <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <h4>Text in a modal</h4>
-            <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</p>
-
-            <h4>Popover in a modal</h4>
-            
-
-            <hr />
-
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={this.close}>Close</Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
-    );
-  }
-});
-=======
 import Badge from "react-bootstrap/Badge";
 import Modal from "react-bootstrap/Modal";
 import SyntaxHighlighter from 'react-syntax-highlighter';
@@ -103,7 +49,6 @@ class MyModal extends React.Component{
           );
     }
 }
->>>>>>> d873b1c7a688269065650be25da7ade7227c8931
 
 class Submission extends React.Component{
     constructor(props) {
@@ -111,10 +56,7 @@ class Submission extends React.Component{
         this.state = {
           best : null,
           lastest : null,
-<<<<<<< HEAD
-=======
           SC : 'test',
->>>>>>> d873b1c7a688269065650be25da7ade7227c8931
         };
     }
     componentDidMount() {
@@ -150,15 +92,8 @@ class Submission extends React.Component{
         var best_submission = [], last_submission = []
         for(var e in this.state.best) {
             var temp = this.state.best[e]
-<<<<<<< HEAD
-            best_submission.push(<tr>
-                <td>
-                    <source_code />
-                </td>
-=======
             best_submission.push(<tr key={e}>
                 <td>Best 👍</td>
->>>>>>> d873b1c7a688269065650be25da7ade7227c8931
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
                 <ButtonGroup size="sm">
@@ -365,7 +300,7 @@ class Annoucement extends React.Component{
         return(
             <div>
                 <br></br>
-                <Card sticky>
+                <Card>
                     <Card.Header>Time left</Card.Header>
                     <Card.Title>
                         <Container>
