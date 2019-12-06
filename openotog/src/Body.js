@@ -11,15 +11,52 @@ import Form from "react-bootstrap/Form";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Badge from "react-bootstrap/Badge";
+import Modal from "react-bootstrap/Modal";
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 //import "./App.css";
+
+class MyModal extends React.Component{
+    Hidemodal= () => {
+        this.props.onHide(false)
+    }
+    render(){
+        var Code = this.props.SC
+        //console.log(Code);
+        return (
+            <Modal
+              show={this.props.modalShow}
+              onHide={this.Hidemodal}
+              size="lg"
+              aria-labelledby="contained-modal-title-vcenter"
+              centered
+            >
+                <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                Source Code⚡⚡
+                </Modal.Title>
+                </Modal.Header>
+              <Modal.Body>
+                <SyntaxHighlighter language="cpp" style={atomOneDark}>
+                    {Code}
+                </SyntaxHighlighter>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button onClick={this.Hidemodal}>Close</Button>
+              </Modal.Footer>
+            </Modal>
+          );
+    }
+}
 
 class Submission extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
           best : null,
-          lastest : null
+          lastest : null,
+          SC : 'test',
         };
     }
     componentDidMount() {
@@ -37,7 +74,17 @@ class Submission extends React.Component{
     sendData = () => {
         if(this.state.lastest[0] !== undefined)this.props.ParentCallback(this.state.lastest[0].score);
     }
+    HideSc = event => {
+        this.setState({showSc : event})
+    }
+    ShowBest = () => {
+        this.setState({showSc : true, SC : this.state.best[0].scode})
+    }
+    ShowLast = () => {
+        this.setState({showSc : true, SC : this.state.lastest[0].scode })
+    }
     render(){
+        //console.log('submit ' + this.state.best);
         var best_submission = [], last_submission = []
         for(var e in this.state.best) {
             var temp = this.state.best[e]
@@ -45,6 +92,8 @@ class Submission extends React.Component{
                 <td>Best 👍</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
+                <Button onClick={this.ShowBest}> * </Button>
+                
             </tr>)
         }
         for(var e in this.state.lastest) {
@@ -53,6 +102,7 @@ class Submission extends React.Component{
                 <td>Lastest</td>
                 <td>{temp.result}</td>
                 <td>{temp.score}</td>
+                <Button onClick={this.ShowLast}> * </Button>
             </tr>)
         }
         return(
@@ -71,6 +121,7 @@ class Submission extends React.Component{
                     {best_submission}
                 </tbody>
             </Table>
+            <MyModal modalShow={this.state.showSc} onHide={this.HideSc} SC={this.state.SC} />
         </div>
         );
     }
@@ -185,11 +236,9 @@ class Timer extends React.Component{
         super();
         this.state = {
             time: {}, 
-            seconds: 5000,
-            isloading : true
+            finish_time: 1,
         }
         this.timer = 0;
-        this.countdown = this.countdown.bind(this);
     }
     secondsToTime(secs){
         let hour = Math.floor(secs/ (60*60));
@@ -209,33 +258,29 @@ class Timer extends React.Component{
     }
 
     componentDidMount() {
-        this.setState({ seconds: this.props.CountFrom });
-        let timeleft = this.secondsToTime(this.state.seconds);
+        this.setState({ finish_time: this.props.CountTo-25200 });
+        let timeNow = Math.floor((Date.now())/1000)
+        let seconds = this.props.CountTo- 25200 - timeNow;
+        let timeleft = this.secondsToTime(seconds);
         this.setState({ time: timeleft});
-        if (this.timer == 0 && this.state.seconds > 0){
+        if (this.timer == 0 && this.state.finish_time > 0){
             this.timer = setInterval(this.countdown, 1000);
         }  
-        this.setState({ isloading: false });
     }
-
-    countdown(){
-        let seconds = this.state.seconds - 1;
+    countdown = () => {
+        let timeNow = Math.floor((Date.now())/1000)
+        let seconds = this.state.finish_time - timeNow;
+        //console.log(seconds);
+        
         this.setState({
             time : this.secondsToTime(seconds),
-            seconds : seconds,
         });
-
-        if(seconds == 0){
+        if(seconds <= 0){
             clearInterval(this.timer);
         }
     }
 
     render(){
-        if(this.state.isloading) {
-            return(
-                <div>loading...</div>
-            )
-        }
         return(
             <div>
                 {this.state.time.h} hr : {this.state.time.m} m : {this.state.time.s} s
@@ -245,7 +290,7 @@ class Timer extends React.Component{
 }
 class Annoucement extends React.Component{
     render(){
-        var timee = 50;
+        var timee = 1575563400;
         return(
             <div>
                 <br></br>
@@ -257,7 +302,7 @@ class Annoucement extends React.Component{
                             <Col xs = {2}></Col>
                             <Col>
                                 <br></br>
-                                <Timer CountFrom={timee}/> 
+                                <Timer CountTo={timee}/> 
                                 <br></br>
                             </Col>
                             </Row>
