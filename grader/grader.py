@@ -132,7 +132,9 @@ while 1:
         createfile(myresult)
         cnt = 0
         ans = ""
+        perfect = True
         sumtime = 0
+        lastTest = 0
         result = None
         that_time = str(myresult[1])
         id_prob = str(myresult[3])
@@ -140,6 +142,7 @@ while 1:
         id_user = str(myresult[2])
         time_limit = float(myprob[4])
         mem_limit = int(myprob[5])
+        subtask = myprob[7].split(' ')
         result = create(id_prob + "_" + id_user + "_" + that_time, "C++")
         print(result)
         if(os.path.exists("source/" + name_prob + "/script.php")) :
@@ -154,51 +157,64 @@ while 1:
             testcase = '-1'
             result = "No Testcases."
         if(result == None):
-            for x in range(int(testcase)):
-                result = None
-                t = execute("C++", id_user, name_prob, id_prob,
-                            str(x + 1), time_limit, mem_limit*1024, that_time)
-                result_user = "env/output.txt"
-                result_src = "source/" + name_prob + "/" + str(x + 1) + ".sol"
-                timetaken = 0
-                if t == 124:
-                    result = "TLE"
-                    file_write('env/error.txt',
-                               "Time Limit Exceeded - Process killed.")
-                    timetaken = timediff
-                elif t == 139:
-                    file_write(
-                        'env/error.txt', 'SIGSEGV||Segmentation fault (core dumped)\n' + file_read("env/error.txt"))
-                    timetaken = timediff
-                elif t == 136:
-                    file_write(
-                        'env/error.txt', 'SIGFPE||Floating point exception\n' + file_read("env/error.txt"))
-                    timetaken = timediff
-                elif t == 134:
-                    file_write('env/error.txt', 'SIGABRT||Aborted\n' +
-                               file_read("env/error.txt"))
-                    timetaken = timediff
-                elif t != 0:
-                    file_write('env/error.txt', 'NZEC||return code : ' +
-                               str(t) + "\n" + file_read("env/error.txt"))
-                    timetaken = timediff
-                else:
-                    timetaken = timediff
-                sumtime = sumtime + timetaken
-                if(result == None and t == 0):
-                    if(cmpfunc(result_user, result_src)):
-                        ans = ans + 'P'
-                        cnt = cnt + 1
+            for sub in subtask :
+                ans = ans + '['
+                if perfect == False :
+                    for x in range(lastTest,int(sub)):
+                        ans = ans + 'S'
+                    ans = ans + ']'
+                    lastTest = int(sub)
+                    continue
+                for x in range(lastTest,int(sub)):
+                    result = None
+                    t = execute("C++", id_user, name_prob, id_prob,
+                                str(x + 1), time_limit, mem_limit*1024, that_time)
+                    result_user = "env/output.txt"
+                    result_src = "source/" + name_prob + "/" + str(x + 1) + ".sol"
+                    timetaken = 0
+                    if t == 124:
+                        result = "TLE"
+                        file_write('env/error.txt',
+                                "Time Limit Exceeded - Process killed.")
+                        timetaken = timediff
+                    elif t == 139:
+                        file_write(
+                            'env/error.txt', 'SIGSEGV||Segmentation fault (core dumped)\n' + file_read("env/error.txt"))
+                        timetaken = timediff
+                    elif t == 136:
+                        file_write(
+                            'env/error.txt', 'SIGFPE||Floating point exception\n' + file_read("env/error.txt"))
+                        timetaken = timediff
+                    elif t == 134:
+                        file_write('env/error.txt', 'SIGABRT||Aborted\n' +
+                                file_read("env/error.txt"))
+                        timetaken = timediff
+                    elif t != 0:
+                        file_write('env/error.txt', 'NZEC||return code : ' +
+                                str(t) + "\n" + file_read("env/error.txt"))
+                        timetaken = timediff
                     else:
-                        ans = ans + '-'
-                elif(result == 'TLE'):
-                    ans = ans + 'T'
-                else:
-                    ans = ans + 'X'
-                sql = "UPDATE submis SET result = %s WHERE idResult = %s"
-                val = ('Running in testcase ' + str(x+1) , myresult[0])
-                mycursor.execute(sql, val)
-                mydb.commit()
+                        timetaken = timediff
+                    sumtime = sumtime + timetaken
+                    if(result == None and t == 0):
+                        if(cmpfunc(result_user, result_src)):
+                            ans = ans + 'P'
+                            cnt = cnt + 1
+                        else:
+                            perfect = False
+                            ans = ans + '-'
+                    elif(result == 'TLE'):
+                        ans = ans + 'T'
+                        perfect = False
+                    else:
+                        ans = ans + 'X'
+                        perfect = False
+                    sql = "UPDATE submis SET result = %s WHERE idResult = %s"
+                    val = ('Running in testcase ' + str(x+1) , myresult[0])
+                    mycursor.execute(sql, val)
+                    mydb.commit()
+                ans = ans + ']'
+                lastTest = int(sub)
         else:
             ans = result
         print(ans)
