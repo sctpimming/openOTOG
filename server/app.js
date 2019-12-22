@@ -1,10 +1,13 @@
 const express = require('express')
 const bodyParser = require("body-parser")
 const multer  = require('multer')
+const cors = require('cors');
 const mysql = require('mysql');
 const fs = require("fs");
 const jwt = require('jsonwebtoken');
 const logger = require('morgan');
+const path = require('path')
+const https = require('https');
 require('dotenv').config()
 process.env.SECRET_KEY = fs.readFileSync('./private.key', 'utf8');
 process.env.PUBLIC_KEY = fs.readFileSync('./public.key', 'utf8');
@@ -23,8 +26,8 @@ app.use(bodyParser.urlencoded({
 	extended : true
 }))
 app.use(logger('dev'));
-
-app.get('/problem',(req,res) => {
+app.use('/', express.static('build'));
+app.get('/api/problem',(req,res) => {
 	var sql = "select * from openotog.prob limit 3"
 	con.query(sql,(err,result) => {
 		if(err) throw err
@@ -35,12 +38,12 @@ app.get('/problem',(req,res) => {
 		})
 	})
 })
-app.get('/pdf/:sname',(req,res) => {
+app.get('/api/pdf/:sname',(req,res) => {
 	var file = fs.createReadStream("./docs/"+req.params.sname+".pdf");
   	file.pipe(res);
 })
 
-app.post('/user/login',(req,res) => {
+app.post('/api/user/login',(req,res) => {
 	var username = req.body.username;
 	var password = req.body.password;
 	console.log(username + ' Sign in at' + Date(Date.now()));
@@ -59,11 +62,11 @@ app.post('/user/login',(req,res) => {
 		}
 	})
 })
-app.get('/submission/:id',(req,res) => {
+app.get('/api/submission/:id',(req,res) => {
 	var id = req.params.id
 	var token = req.headers.authorization
 	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
-	var last_query = 'select idResult,result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
+	var last_query = 'select idResult,result,score,errmsg,scode,status from submis where user_id = ? and prob_id = ? order by idResult desc limit 1'
 	var best_query = 'select idResult,result,score,errmsg,scode from submis where user_id = ? and prob_id = ? order by score desc, timeuse asc limit 1'
 	var lastest = new Promise((resolve, reject) => con.query(last_query,[decoded.id,id],(err,result) => {
 		if(err) throw err
@@ -97,7 +100,7 @@ var storage = multer.diskStorage({
 	}
 })
 var upload = multer({ storage: storage })
-app.post('/upload/:id',upload.single('file'),(req,res) => {
+app.post('/api/upload/:id',upload.single('file'),(req,res) => {
 	var id = req.params.id
 	var token = req.headers.authorization
 	var decoded = jwt.verify(token, process.env.PUBLIC_KEY)
@@ -111,8 +114,9 @@ app.post('/upload/:id',upload.single('file'),(req,res) => {
 	var sql = "INSERT INTO submis (time, user_id, prob_id, status,scode) VALUES ?";
 	var values = [[time_now,Number(decoded.id),Number(id),0,text],];
 	con.query(sql, [values], (err, result) => {if(err) throw err})
+	res.status(200).send('Upload Complete!')
 })
-app.post('/quickresend',(req,res) => {
+app.post('/api/quickresend',(req,res) => {
 	var id = req.body.id
 	var sql = 'select * from submis where idResult = ?'
 	con.query(sql,[id],(err,result) => {
@@ -124,7 +128,16 @@ app.post('/quickresend',(req,res) => {
 		var values = [[time_now,Number(result.user_id),Number(result.prob_id),0,result.scode],];
 		con.query(sql, [values], (err, result) => {if(err) throw err})
 	})
+	res.status(200).send('Resend Complete!')
 })
-app.listen(PORT,() => {
+app.get('/*', function(req, res) {
+	res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+const options = {
+	key: fs.readFileSync('./server.key'),
+	cert: fs.readFileSync('./server.crt')
+};
+var server = https.createServer(options,app);
+server.listen(PORT,() => {
 	console.log("Starting server at PORT " + PORT)
 })
