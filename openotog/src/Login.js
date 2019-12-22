@@ -44,7 +44,7 @@ class Login extends Component {
   render() {
     var redirect = this.state.redirect;
     if (redirect) {
-      return <Redirect to='/main'/>;
+      return <Redirect to='/'/>;
     }
     return (
         <Container>

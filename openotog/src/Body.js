@@ -18,7 +18,7 @@ import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 //import "./App.css";
 
 class MyModal extends React.Component{
-    Hidemodal= () => {
+    Hidemodal = () => {
         this.props.onHide(false)
     }
     render(){
@@ -58,9 +58,10 @@ class Submission extends React.Component{
           lastest : null,
           SC : 'test',
         };
+        this.waitingData = 0;
     }
     componentDidMount() {
-        fetch('/submission/'+this.props.idProb,{
+        fetch('/api/submission/'+this.props.idProb,{
             headers: {
                 authorization: localStorage.usertoken
             }
@@ -68,11 +69,14 @@ class Submission extends React.Component{
         .then(res => res.json())
         .then(data => {
             this.setState({best : data.best_submit, lastest : data.lastest_submit})
-            this.sendData()     
+            this.sendData()
+            if(this.state.lastest[0] !== undefined)
+                if(this.state.lastest[0].status == 0)
+                    this.waitingData = setInterval(this.fetchData, 1000);
         })
     }
     sendData = () => {
-        if(this.state.lastest[0] !== undefined)this.props.ParentCallback(this.state.lastest[0].score);
+        if(this.state.lastest[0] !== undefined)this.props.ParentCallback(this.state.lastest[0].score,this.state.best[0].idResult);
     }
     HideSc = event => {
         this.setState({showSc : event})
@@ -83,9 +87,18 @@ class Submission extends React.Component{
     ShowLast = () => {
         this.setState({showSc : true, SC : this.state.lastest[0].scode })
     }
-    quickResend = e => {
-        axios.post('/quickresend',{id : e})
-        window.location.reload(false);
+    fetchData = () => {
+        fetch('/api/submission/'+this.props.idProb,{
+            headers: {
+                authorization: localStorage.usertoken
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            this.setState({best : data.best_submit, lastest : data.lastest_submit})
+            this.sendData()
+            if(this.state.lastest[0].status == 1) clearInterval(this.waitingData);
+        })
     }
     render(){
         //console.log('submit ' + this.state.best);
@@ -141,8 +154,9 @@ class Problem extends React.Component{
 		this.state = {
             selectedFile: undefined,
             fileName: 'Select file',
-            solved: false
-		}
+            solved: false,
+            idBest: -1
+        }
 	}
 	onChangeHandler=event=>{
         var name = 'Select file'
@@ -152,21 +166,38 @@ class Problem extends React.Component{
             fileName: name
 		})
 		//console.log(event.target.files[0])
-	}
+    }
+    quickResend = () => {
+        if(this.state.idBest != -1) {
+            fetch('/api/quickresend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id : this.state.idBest})
+            }).then(res => {
+                console.log(res)
+                window.location.reload(false);
+            })
+        }
+    }
 	onClickHandler = () => {
         if(this.state.selectedFile === undefined) return false
         const data = new FormData() 
         data.append('file', this.state.selectedFile)
-		axios.post("/upload/"+this.props.id_Prob,data, {
-			headers : {
+        fetch('/api/upload/'+this.props.id_Prob ,{
+            method: 'POST',
+            headers : {
 				authorization : localStorage.usertoken
-			}
-        })
-        .then(res => console.log(res.statusText))
-        window.location.reload(false);
+			},
+            body: data
+          }).then(response => {
+              console.log(response)
+              window.location.reload(false);
+            })   
 	}
     viewPDF = async () => {
-        fetch('/pdf/'+this.props.sname, {
+        fetch('/api/pdf/'+this.props.sname, {
             method: "GET",
             headers: {
                 "Content-Type": "application/pdf"
@@ -181,8 +212,9 @@ class Problem extends React.Component{
             console.log(error);
         });
     };
-    CallbackFunc = (ChildData) => {
+    CallbackFunc = (ChildData,id) => {
         if(ChildData == 100)this.setState({solved:true})
+        this.setState({idBest:id})
         
     }
     render(){
@@ -195,7 +227,7 @@ class Problem extends React.Component{
                     Problem {this.props.index} {this.props.name + ' '}
                     {this.state.solved && <Badge variant = "success">Solved</Badge>}
                     <p></p>
-                    <Button variant = "outline-info" size = "sm">Quick Submit ⚡</Button>
+                    <Button variant = "outline-info" size = "sm" onClick={this.quickResend.bind(this)}>Quick Submit ⚡</Button>
                 </Card.Header>
 
                 <Row>
@@ -213,7 +245,7 @@ class Problem extends React.Component{
                                 <Col xs = {10}>
                                     <ButtonToolbar>
                                         <ButtonGroup className = "mr-4">
-                                            <Button variant="primary" type ="submit" onClick={this.onClickHandler} >
+                                            <Button variant="primary" type ="submit" onClick={this.onClickHandler.bind(this)} >
                                                 Submit
                                             </Button>    
                                         </ButtonGroup>
@@ -343,7 +375,7 @@ class Body extends React.Component{
         };
     }
     componentDidMount() {
-        fetch('/problem')
+        fetch('/api/problem')
         .then(res => res.json())
         .then(data => this.setState({data : data.problem}))
     }

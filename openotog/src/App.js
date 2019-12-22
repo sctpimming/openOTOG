@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import {
-  BrowserRouter as Router,
+  BrowserRouter,
   Switch,
-  Route
+  Route,
+  Redirect,
+  Router
 } from "react-router-dom";
 import Jumbotron from "react-bootstrap/Jumbotron";
 import Toast from "react-bootstrap/Toast";
@@ -21,13 +23,12 @@ const header = (
 class App extends React.Component{
   render(){
     return (
-      <Router>
-        <Switch>
-          <Route path='/main' component={Main}>
-          </Route>
-          <Route path='/login' component={Login}/>
-        </Switch>
-      </Router>
+      <BrowserRouter>
+            <Switch>
+              <Route path='/main' component={Main}/>
+              <Route path='/login' component={Login}/>
+            </Switch>
+      </BrowserRouter>    
     );
   }
 }
